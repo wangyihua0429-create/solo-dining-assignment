@@ -2,16 +2,27 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Eat Outside</title>
 <style>
-body{max-width:700px;margin:50px auto;font-family:Arial;padding:20px}
-a{color:#2563eb;text-decoration:none;font-size:18px}
+*{box-sizing: border-box;margin:0;padding:0;font-family:Arial, Helvetica, sans-serif;}
+body{max-width:720px;margin:40px auto;padding:30px;line-height:1.6;}
+h2{text-align:center;margin-bottom:20px;font-size:24px;color:#222;}
+p{margin-bottom:20px;font-size:17px;}
+video{width:100%;border-radius:8px;margin:25px 0;}
+.back-home{display:inline-block;padding:12px 22px;background:#2563eb;color:white;text-decoration:none;border-radius:8px;font-size:17px;}
 </style>
 </head>
 <body>
 <h2>Option A: Eat Outside</h2>
-<p>Dining out alone has become a mainstream social trend. Many cafes and restaurants design independent seats for solo diners, letting people enjoy delicious food without feeling awkward.</p >
-<br>
-<a href=" ">Click here to go back to main page</a >
+<p>Dining out alone has become a mainstream social trend. Many cafes and restaurants design independent seats for solo diners.</p >
+
+<!-- A分支视频，页面打开自动播放 -->
+<video controls autoplay>
+    <source src="videoA.mp4" type="video/mp4">
+</video>
+
+<!-- 返回首页按键 -->
+<a href=" " class="back-home">Return to Main Page</a >
 </body>
 </html>
