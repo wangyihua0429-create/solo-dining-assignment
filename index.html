@@ -8,29 +8,26 @@
 *{box-sizing: border-box;margin:0;padding:0;font-family:Arial, Helvetica, sans-serif;}
 body{max-width:720px;margin:40px auto;padding:30px;line-height:1.6;}
 h1{text-align:center;color:#222;margin-bottom:30px;font-size:28px;}
-/* 聊天机器人样式 */
 .chatbox{border:1px solid #ddd;border-radius:12px;padding:16px;margin-bottom:30px;background:#f8f9fa;}
 .chat-title{font-weight:bold;font-size:19px;margin-bottom:12px}
-.chat-content{min-height:120px;padding:10px;border:1px solid #ccc;border-radius:6px;margin-bottom:10px;}
+.chat-content{min-height:140px;padding:10px;border:1px solid #ccc;border-radius:6px;margin-bottom:10px;overflow-y:auto;}
 #userInput{width:85%;padding:9px;font-size:16px;border:1px solid #bbb;border-radius:4px;}
 #sendBtn{padding:9px 16px;background:#2563eb;color:white;border:none;border-radius:4px;cursor:pointer;}
-/* 视频样式 */
 video{width:100%;border-radius:8px;margin:25px 0;}
-/* 选择按钮区域 */
 .button-area{display:flex;gap:30px;justify-content:center;margin-top:15px;}
 .option-btn{padding:14px 26px;background:#2563eb;color:white;text-decoration:none;border-radius:8px;font-size:18px;transition:0.2s;}
 .option-btn:hover{background:#1d4ed8;}
+.user-text{color:#2563eb;margin:4px 0;}
+.bot-text{color:#222;margin:4px 0;}
 </style>
 </head>
 <body>
-<!-- 页面顶部大标题 -->
 <h1>Interactive Story: Choices of Solo Dining</h1>
 
-<!-- Chatbot 聊天窗口，把你自己机器人代码填进chat-content区域 -->
 <div class="chatbox">
     <div class="chat-title">Conversation Assistant</div>
     <div class="chat-content" id="chatLog">
-        Chatbot content goes here, paste your chatbot code inside this block
+        <div class="bot-text">Assistant: Welcome! How about asking me a question about Solo Dining Culture?</div>
     </div>
     <div>
         <input type="text" id="userInput" placeholder="Type your message here...">
@@ -38,17 +35,115 @@ video{width:100%;border-radius:8px;margin:25px 0;}
     </div>
 </div>
 
-<!-- 主线视频 -->
 <video controls>
     <source src="main-video.mp4" type="video/mp4">
     Your browser cannot load this video.
 </video>
 
-<!-- 两个跳转按钮 -->
 <div class="button-area">
     <a href=" " class="option-btn">Option A: Eat Outside</a >
     <a href="B.html" class="option-btn">Option B: Eat at Home</a >
 </div>
 
+<script>
+const chatLog = document.getElementById('chatLog');
+const userInput = document.getElementById('userInput');
+const sendBtn = document.getElementById('sendBtn');
+
+// 完整问答库（你docx里全部规则已录入）
+const qaData = [
+    {pattern: "hello", reply: "Hello! I am your Solo Dining Culture Guide. Ask me anything about the single economy, psychological benefits, restaurant designs, or the solo lifestyle!"},
+    {pattern: "hi", reply: "Hello! I am your Solo Dining Culture Guide. Ask me anything about the single economy, psychological benefits, restaurant designs, or the solo lifestyle!"},
+    {pattern: "*definition*", reply: "Solo dining culture refers to the practice of eating out or enjoying meals alone by choice. It reflects a modern lifestyle centered on independence, autonomy, and self-care."},
+    {pattern: "what is solo dining", reply: "Solo dining culture refers to the practice of eating out or enjoying meals alone by choice. It reflects a modern lifestyle centered on independence, autonomy, and self-care."},
+    {pattern: "*why popular", reply: "Its rise is driven by rapid urbanization, an increase in single-person households, and the 'pleasing oneself' economy, where people prioritize personal comfort over forced socialization."},
+    {pattern: "*reason*", reply: "Its rise is driven by rapid urbanization, an increase in single-person households, and the 'pleasing oneself' economy, where people prioritize personal comfort over forced socialization."},
+    {pattern: "*loneliness", reply: "Not at all! Modern solo dining is viewed as high-quality solitude. It allows individuals to escape exhausting social obligations and focus entirely on the sensory experience of food."},
+    {pattern: "*sad", reply: "Not at all! Modern solo dining is viewed as high-quality solitude. It allows individuals to escape exhausting social obligations and focus entirely on the sensory experience of food."},
+    {pattern: "*benefits", reply: "The main benefits include complete freedom in choosing the menu without compromise, controlling your own dining pace, and saving social energy from awkward small talk."},
+    {pattern: "*advantages", reply: "The main benefits include complete freedom in choosing the menu without compromise, controlling your own dining pace, and saving social energy from awkward small talk."},
+    {pattern: "*disadvantages", reply: "The main challenges are the inability to sample multiple dishes without wasting food, and occasional social awkwardness when dining in traditional, family-oriented restaurants."},
+    {pattern: "*challenges", reply: "The main challenges are the inability to sample multiple dishes without wasting food, and occasional social awkwardness when dining in traditional, family-oriented restaurants."},
+    {pattern: "*psychology", reply: "Psychologically, it satisfies the modern need for personal boundaries. Dining alone serves as an effective form of mental decompression and self-healing from daily stress."},
+    {pattern: "*mental*", reply: "Psychologically, it satisfies the modern need for personal boundaries. Dining alone serves as an effective form of mental decompression and self-healing from daily stress."},
+    {pattern: "*target audience", reply: "The core demographics are urban young professionals, single youth, introverts, and anyone seeking a brief, peaceful escape from work or family demands."},
+    {pattern: "*demographic*", reply: "The core demographics are urban young professionals, single youth, introverts, and anyone seeking a brief, peaceful escape from work or family demands."},
+    {pattern: "*stigma", reply: "While it was once stigmatized as being 'friendless', society now embraces solo dining as a confident sign of independence and knowing how to enjoy life."},
+    {pattern: "*awkward", reply: "While it was once stigmatized as being 'friendless', society now embraces solo dining as a confident sign of independence and knowing how to enjoy life."},
+    {pattern: "*restaurant", reply: "Excellent choices include Japanese ramen bars, conveyor-belt hotpot, convenience stores, and fast-casual cafes that offer dedicated single-row bar seating."},
+    {pattern: "*where to eat", reply: "Excellent choices include Japanese ramen bars, conveyor-belt hotpot, convenience stores, and fast-casual cafes that offer dedicated single-row bar seating."},
+    {pattern: "*hotpot", reply: "Yes! Many hotpot brands now offer mini individual pots and partitioned booths, making solo hotpot a highly comfortable and ritualistic experience."},
+    {pattern: "*bbq", reply: "Absolutely. Modern Yakiniku (BBQ) places now feature single-person electric grills and small-portion meat platters designed specifically for solo diners."},
+    {pattern: "*barbecue", reply: "Absolutely. Modern Yakiniku (BBQ) places now feature single-person electric grills and small-portion meat platters designed specifically for solo diners."},
+    {pattern: "*design", reply: "Key interior designs include counter seating, facing-the-wall bars, removable privacy partitions, and built-in smartphone holders with charging ports."},
+    {pattern: "*booth", reply: "Key interior designs include counter seating, facing-the-wall bars, removable privacy partitions, and built-in smartphone holders with charging ports."},
+    {pattern: "*economy", reply: "Solo dining heavily drives the 'solo economy', forcing the catering industry to adapt by offering half-portion menus, single sets, and small-packaged ready meals."},
+    {pattern: "*market*", reply: "Solo dining heavily drives the 'solo economy', forcing the catering industry to adapt by offering half-portion menus, single sets, and small-packaged ready meals."},
+    {pattern: "*home", reply: "Dining out saves time and offers variety, while cooking a 'solo meal' at home provides a sense of mindfulness, creative expression, and domestic ritual."},
+    {pattern: "*cook*", reply: "Dining out saves time and offers variety, while cooking a 'solo meal' at home provides a sense of mindfulness, creative expression, and domestic ritual."},
+    {pattern: "*convenience store", reply: "Convenience stores and high-quality ready meals are pillars of solo dining, providing fast, cost-effective, and portion-controlled options for busy individuals."},
+    {pattern: "*ready meal", reply: "Convenience stores and high-quality ready meals are pillars of solo dining, providing fast, cost-effective, and portion-controlled options for busy individuals."},
+    {pattern: "*phone", reply: "This is known as the 'digital companion' phenomenon. Watching videos or TV shows while eating provides psychological companionship and helps solo diners relax."},
+    {pattern: "*video*", reply: "This is known as the 'digital companion' phenomenon. Watching videos or TV shows while eating provides psychological companionship and helps solo diners relax."},
+    {pattern: "*gender", reply: "Studies show women often prioritize the aesthetic ambiance and emotional comfort of solo dining, whereas men tend to focus more on efficiency, portion size, and value."},
+    {pattern: "*origin", reply: "As a commercial model, it matured in Japan (e.g., Ichiran Ramen), heavily influenced by hyper-individualistic urban social structures and a culture that avoids bothering others."},
+    {pattern: "*japan", reply: "As a commercial model, it matured in Japan (e.g., Ichiran Ramen), heavily influenced by hyper-individualistic urban social structures and a culture that avoids bothering others."},
+    {pattern: "*media", reply: "Mukbang (eating broadcasts) and food vlogs offer visual and auditory companionship, reducing the sense of isolation and normalizing solo eating globally."},
+    {pattern: "*mukbang", reply: "Mukbang (eating broadcasts) and food vlogs offer visual and auditory companionship, reducing the sense of isolation and normalizing solo eating globally."},
+    {pattern: "*health", reply: "Nutritional balance is vital. Since solo diners have limited dish variety per meal, it is recommended to choose nutrient-dense, small-portioned side dishes."},
+    {pattern: "*nutrition", reply: "Nutritional balance is vital. Since solo diners have limited dish variety per meal, it is recommended to choose nutrient-dense, small-portioned side dishes."},
+    {pattern: "*trend", reply: "Future trends include premium solo dining experiences, AI dining companions, and anonymous dinner-matching apps, solidifying it as a mainstream market sector."},
+    {pattern: "*future*", reply: "Future trends include premium solo dining experiences, AI dining companions, and anonymous dinner-matching apps, solidifying it as a mainstream market sector."},
+    {pattern: "*attract", reply: "Restaurants can attract solo diners by offering seamless contactless mobile ordering, zero-disturbance service, and welcoming single-person combo options."},
+    {pattern: "*marketing", reply: "Restaurants can attract solo diners by offering seamless contactless mobile ordering, zero-disturbance service, and welcoming single-person combo options."},
+    {pattern: "*order", reply: "Look for eateries that offer half-portions or 'tasting platters'. If you are at a standard restaurant, stick to one main dish and a small side, or take home leftovers."},
+    {pattern: "*portion", reply: "Look for eateries that offer half-portions or 'tasting platters'. If you are at a standard restaurant, stick to one main dish and a small side, or take home leftovers."},
+    {pattern: "*advice", reply: "Put on your headphones, queue up your favorite show, and find a restaurant with privacy booths. Take your time, savor the flavors, and enjoy your own company!"},
+    {pattern: "*tips", reply: "Put on your headphones, queue up your favorite show, and find a restaurant with privacy booths. Take your time, savor the flavors, and enjoy your own company!"},
+    {pattern: "*", reply: "Hello! Try asking me about the solo economy, privacy booths, or benefits of eating alone."}
+];
+
+// 匹配问答逻辑
+function getBotReply(userMsg) {
+    const msg = userMsg.toLowerCase().trim();
+    for(let item of qaData){
+        let p = item.pattern.toLowerCase();
+        if(p.startsWith("*") && p.endsWith("*")){
+            let keyword = p.replaceAll("*","");
+            if(msg.includes(keyword)) return item.reply;
+        }else if(p.startsWith("*")){
+            let keyword = p.replace("*","");
+            if(msg.includes(keyword)) return item.reply;
+        }else if(p.endsWith("*")){
+            let keyword = p.replace("*","");
+            if(msg.includes(keyword)) return item.reply;
+        }else{
+            if(msg === p) return item.reply;
+        }
+    }
+    // 匹配通用兜底
+    for(let item of qaData){
+        if(item.pattern === "*") return item.reply;
+    }
+    return "Sorry, I don't quite understand. Try another question about solo dining!";
+}
+
+function sendMessage(){
+    let text = userInput.value.trim();
+    if(text === "") return;
+    // 用户消息
+    chatLog.innerHTML += `<div class="user-text">You: ${text}</div>`;
+    // 机器人回复
+    let reply = getBotReply(text);
+    chatLog.innerHTML += `<div class="bot-text">Assistant: ${reply}</div>`;
+    chatLog.scrollTop = chatLog.scrollHeight;
+    userInput.value = "";
+}
+
+sendBtn.addEventListener('click', sendMessage);
+userInput.addEventListener('keydown', e => {
+    if(e.key === "Enter") sendMessage();
+})
+</script>
 </body>
 </html>
