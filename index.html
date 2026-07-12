@@ -35,8 +35,8 @@ video{width:100%;border-radius:8px;margin:25px 0;}
     </div>
 </div>
 
-<video controls>
-    <source src="main-video.mp4" type="video/mp4">
+<video controls playsinline>
+    <source src="main_video.MOV" type="video/mp4">
     Your browser cannot load this video.
 </video>
 
@@ -50,7 +50,6 @@ const chatLog = document.getElementById('chatLog');
 const userInput = document.getElementById('userInput');
 const sendBtn = document.getElementById('sendBtn');
 
-// 完整问答库（你docx里全部规则已录入）
 const qaData = [
     {pattern: "hello", reply: "Hello! I am your Solo Dining Culture Guide. Ask me anything about the single economy, psychological benefits, restaurant designs, or the solo lifestyle!"},
     {pattern: "hi", reply: "Hello! I am your Solo Dining Culture Guide. Ask me anything about the single economy, psychological benefits, restaurant designs, or the solo lifestyle!"},
@@ -103,7 +102,6 @@ const qaData = [
     {pattern: "*", reply: "Hello! Try asking me about the solo economy, privacy booths, or benefits of eating alone."}
 ];
 
-// 匹配问答逻辑
 function getBotReply(userMsg) {
     const msg = userMsg.toLowerCase().trim();
     for(let item of qaData){
@@ -121,7 +119,6 @@ function getBotReply(userMsg) {
             if(msg === p) return item.reply;
         }
     }
-    // 匹配通用兜底
     for(let item of qaData){
         if(item.pattern === "*") return item.reply;
     }
@@ -131,9 +128,7 @@ function getBotReply(userMsg) {
 function sendMessage(){
     let text = userInput.value.trim();
     if(text === "") return;
-    // 用户消息
     chatLog.innerHTML += `<div class="user-text">You: ${text}</div>`;
-    // 机器人回复
     let reply = getBotReply(text);
     chatLog.innerHTML += `<div class="bot-text">Assistant: ${reply}</div>`;
     chatLog.scrollTop = chatLog.scrollHeight;
